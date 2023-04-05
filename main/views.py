@@ -11,8 +11,16 @@ def index(request):
 
 def login(request):
     
-    return render(request, 'main/login.html')
+    context = {"page_name": "Authorization Page"}
+    return render(request, 'main/login.html', context=context)
 
 def register(request):
 
-	return render(request, 'main/register.html')
+	context = {"page_name": "Registration Page"}
+	return render(request, 'main/register.html', context=context)
+
+def cameras(request):
+
+	context = {"page_name": "Connected cameras"}
+	return render(request, 'main/cameras.html', context=context)
+

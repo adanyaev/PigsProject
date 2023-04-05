@@ -34,6 +34,7 @@ LOGIN_URL = '/login'
 
 INSTALLED_APPS = [
     "main",
+    "api",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -77,12 +78,15 @@ WSGI_APPLICATION = "WebPigs.wsgi.application"
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'PigsProjectDb',
+        'USER' : 'PigsProjectUser',
+        'PASSWORD' : 'Qwerty2312',
+        'HOST' : '127.0.0.1',
+        'PORT' : '5432',
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
@@ -106,7 +110,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/
 
-LANGUAGE_CODE = "en-us"
+LANGUAGE_CODE = "ru"
 
 TIME_ZONE = "UTC"
 
@@ -121,7 +125,7 @@ USE_TZ = True
 STATIC_URL = "static/"
 
 MEDIA_URL = "/media/"
-MEDIA_ROOT = os.path.join(BASE_DIR, 'Pyramid', 'media')
+MEDIA_ROOT = os.path.join(BASE_DIR, 'main', 'media')
 
 
 # Default primary key field type

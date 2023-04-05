@@ -5,13 +5,21 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 
 
+@login_required
 def index(request):
 	
-	return redirect(login)
+	return render(request, 'main/index.html')
+
 
 def login(request):
     
     return render(request, 'main/login.html')
+
+
+def logout_view(request):
+    logout(request)
+    return redirect(login)
+
 
 def register(request):
 

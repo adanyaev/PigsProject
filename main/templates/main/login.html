@@ -1,35 +1,23 @@
+{% extends "main/base.html" %}
 {% load static %}
-<!DOCTYPE html>
-<html>
-<head>
- <title>Authorization Page</title>
- <meta charset="UTF-8">
- <meta name="viewport" content="width=device-width, initial-scale=1">
- <link rel="stylesheet" href="{% static 'main/css/login.css' %}">
- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
- <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
- <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-</head>
-<body>
- <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
-  <span class="navbar-brand">Authorization Page</span>
- </nav>
+{% block content %}
 
- <div class="container">
-  <form>
-   <div class="form-group">
-    <label for="username">Username:</label>
-    <input type="text" class="form-control" id="username" placeholder="Enter username">
-   </div>
-   <div class="form-group">
-    <label for="password">Password:</label>
-    <input type="password" class="form-control" id="password" placeholder="Enter password">
-   </div>
+<link rel="stylesheet" href="{% static 'main/css/login.css' %}">
 
-   <button type="submit" class="btn btn-primary login-btn">Login</button>
-   <button type="button" class="btn register-btn">Register</button>
-  </form>
- </div>
-</body>
-</html>
+<div class="container">
+    <form>
+        <div class="form-group">
+            <label for="username">Username:</label>
+            <input type="text" class="form-control" id="username" placeholder="Enter username">
+        </div>
+        <div class="form-group">
+            <label for="password">Password:</label>
+            <input type="password" class="form-control" id="password" placeholder="Enter password">
+        </div>
+
+        <button type="submit" class="btn btn-primary login-btn">Login</button>
+        <a href="/registration" type="button" class="btn register-btn">Register</a>
+    </form>
+</div>
+
+{% endblock content %}

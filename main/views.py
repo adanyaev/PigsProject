@@ -27,6 +27,6 @@ def logout_view(request):
 def cameras(request):
 	context = {
 		"page_name": "Connected cameras",
-		"cameras": Camera.objects.all()
+		"cameras": Camera.objects.all().order_by('id')[::-1]
 	}
 	return render(request, 'main/cameras.html', context=context)

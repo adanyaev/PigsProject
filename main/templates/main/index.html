@@ -1,0 +1,39 @@
+<!-- create a pretty web page with some interesting facts about AI in html, css, js using bootstrap version 5  -->
+
+{% extends "main/base.html" %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'main/css/index.css' %}">
+<body>
+    <div class="container">
+      <h1 class="text-center mb-5">Interesting Facts About AI</h1>
+      <div class="row">
+        <div class="col-md-6">
+          <div class="fact">
+            <h3>Fact #1: AI Can Help Fight Climate Change</h3>
+            <p>AI can be used in a variety of ways to help fight climate change, such as by predicting weather patterns, optimizing power grids, and reducing energy consumption in buildings.</p>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="fact">
+            <h3>Fact #2: AI Is Used in Healthcare</h3>
+            <p>AI is used in healthcare to help with tasks such as image analysis, drug discovery, and patient diagnosis.</p>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="fact">
+            <h3>Fact #3: AI Can Be Both Beneficial and Harmful</h3>
+            <p>While AI has the potential to improve many aspects of our lives, it also has the potential to be misused, leading to consequences such as job loss and privacy violations.</p>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="fact">
+            <h3>Fact #4: AI Is Not Just for Businesses</h3>
+            <p>AI is not just for businesses – it has a wide range of applications in areas such as education, entertainment, and even art.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+{% endblock content %}

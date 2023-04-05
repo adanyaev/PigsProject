@@ -1,23 +1,35 @@
 {% extends "main/base.html" %}
 {% load static %}
+
 {% block content %}
 
 <link rel="stylesheet" href="{% static 'main/css/login.css' %}">
+<script src="{% static 'main/js/login.js' %}"></script>
 
-<div class="container">
-    <form>
-        <div class="form-group">
-            <label for="username">Username:</label>
-            <input type="text" class="form-control" id="username" placeholder="Enter username">
+<body>
+    
+    <div class="container">
+        <div class="card">
+          <div class="card-header">
+            Вход
+          </div>
+            <div class="mb-3">
+              <label for="inputUsername" class="form-label">Username</label>
+              <input type="text" class="form-control" id="username">
+            </div>
+            <div class="mb-3">
+              <label for="inputPassword" class="form-label">Password</label>
+              <input type="password" class="form-control" id="password">
+            </div>
+            <div class="mb-3 form-check" id="remember">
+              <input type="checkbox" class="form-check-input" id="rememberMe">
+              <label class="form-check-label" for="rememberMe">Запомнить меня</label>
+            </div>
+            <button type="button" class="btn btn-primary" id="loginButt">Войти</button>
+            <hr>
+            <p class="text-center">Нет аккаунта? <a href="{% url 'registration' %}">Зарегистрироваться</a></p>
         </div>
-        <div class="form-group">
-            <label for="password">Password:</label>
-            <input type="password" class="form-control" id="password" placeholder="Enter password">
-        </div>
+      </div>
 
-        <button type="submit" class="btn btn-primary login-btn">Login</button>
-        <a href="/registration" type="button" class="btn register-btn">Register</a>
-    </form>
-</div>
 
 {% endblock content %}

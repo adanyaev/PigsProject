@@ -5,7 +5,68 @@
 <link rel="stylesheet" href="{% static 'main/css/cameras.css' %}">
 
 <div class="container">
-    
+
+    <button type="button" class="btn btn-success btn-add" data-toggle="modal" data-target="#exampleModalCenter">+ Add new camera</button>
+    <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLongTitle">New camera settings</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+                <form id="create_camera" method="post">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="url">Camera URL</label>
+                        <input type="text" name="url" id="url" class="form-control" placeholder="RTSP Protocol" required >
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="direction">Direction</label>
+                            <select id="direction" name="direction" class="form-control" aria-label="Default select example" required>
+                                <option name="direction" value="Up" selected>Up</option>
+                                <option name="direction" value="Down">Down</option>
+                                <option name="direction" value="Left">Left</option>
+                                <option name="direction" value="Right">Right</option>
+                              </select>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="line_place">Counting line location</label>
+                            <input type="number" name="line_place" value="0.5" min="0" max="1" step="0.1" id="line_place" class="form-control" placeholder="From 0 to 1">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="line_width">Counting line width</label>
+                            <input type="number" name="line_width" value="20" id="line_width" class="form-control" placeholder="Width in pixels">
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="model">Model</label>
+                            <input type="text" name="model" id="model" class="form-control" placeholder="Choose model" required >
+                        </div>
+                    </div>
+                </form>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" form="create_camera" class="btn btn-primary">Add</button>
+                </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    <div class="card camera-card">
+        <h5 class="card-header">Featured</h5>
+        <div class="card-body">
+          <h5 class="card-title">Special title treatment</h5>
+          <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+          <a href="#" class="btn btn-primary">Go somewhere</a>
+        </div>
+      </div>
+
 </div>
 
 {% endblock content %}

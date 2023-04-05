@@ -118,3 +118,62 @@ def create_camera(request):
         }
         
         return JsonResponse(response_data, status=405)
+
+
+@csrf_exempt
+def delete_camera(request):
+    if request.method == "POST" and request.content_type == 'application/json':
+       # parse json data from request
+        data = json.loads(request.body)
+        
+        id = data["id"]
+        print(Camera.objects.filter(id=id))
+        Camera.objects.filter(id=id).delete()
+        
+        response_data = {
+            'success': True,
+            'message': 'Camera was deleted successfully'
+        }
+        
+        return JsonResponse(response_data)
+    
+    # handle other request methods 
+    else:
+        response_data = {
+            'success': False,
+            'message': 'Only POST requests are allowed'
+        }
+        
+        return JsonResponse(response_data, status=405)
+
+
+@csrf_exempt
+def edit_camera(request):
+    if request.method == "POST" and request.content_type == 'application/json':
+       # parse json data from request
+        data = json.loads(request.body)
+        
+        id = data["id"]
+        obj = Camera.objects.get(pk=id)
+        obj.url = data['url']
+        obj.direction = data['direction']
+        obj.line_place = data["line_place"]
+        obj.line_width = data["line_width"]
+        obj.model = data["model"]
+        obj.save()
+        
+        response_data = {
+            'success': True,
+            'message': 'Camera was edited successfully'
+        }
+        
+        return JsonResponse(response_data)
+    
+    # handle other request methods 
+    else:
+        response_data = {
+            'success': False,
+            'message': 'Only POST requests are allowed'
+        }
+        
+        return JsonResponse(response_data, status=405)

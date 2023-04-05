@@ -21,6 +21,15 @@ def register(request):
 
 def cameras(request):
 
+	if request.method == "POST":
+		url = request.POST["url"]
+		direction = request.POST["direction"]
+		line_place = request.POST["line_place"]
+		line_width = request.POST["line_width"]
+		model = request.POST["model"]
+
+		
+
 	context = {"page_name": "Connected cameras"}
 	return render(request, 'main/cameras.html', context=context)
 

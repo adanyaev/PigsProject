@@ -70,3 +70,51 @@ def regUser(request):
         }
         
         return JsonResponse(response_data, status=405)
+    
+
+@csrf_exempt
+def create_camera(request):
+    if request.method == "POST" and request.content_type == 'application/json':
+       # parse json data from request
+        data = json.loads(request.body)
+        
+        # extract required fields from data
+        url = data["url"]
+        direction = data["direction"]
+        line_place = data["line_place"]
+        line_width = data["line_width"]
+        model = data["model"]
+        
+        new_camera = Camera.objects.create(
+            url=url, direction=direction, line_place=line_place,
+            line_width=line_width, model=model
+        )
+
+        new_camera.save()
+
+        # create new user instance and set fields values
+        # new_user = User.objects.create_user(username, email, password)
+        # new_user.first_name = first_name
+        # new_user.last_name = last_name
+        
+        # # save the user
+        # new_user.save()
+
+        # login(request, new_user)
+        
+        # create and return success response
+        response_data = {
+            'success': True,
+            'message': 'Camera was added successfully'
+        }
+        
+        return JsonResponse(response_data)
+    
+    # handle other request methods 
+    else:
+        response_data = {
+            'success': False,
+            'message': 'Only POST requests are allowed'
+        }
+        
+        return JsonResponse(response_data, status=405)

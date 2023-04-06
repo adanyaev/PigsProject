@@ -1,9 +1,12 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login as auth_login, logout
-from django.http import HttpResponse, HttpResponseRedirect, HttpResponseForbidden, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, HttpResponseForbidden, HttpResponseRedirect, StreamingHttpResponse
 from django.contrib.auth.decorators import login_required
+from django.views.decorators import gzip
 from django.views.decorators.csrf import csrf_exempt
 from main.models import *
+
+import main.video_stream as vs
 
 
 def index(request):
@@ -30,3 +33,19 @@ def cameras(request):
 		"cameras": Camera.objects.all().order_by('id')[::-1]
 	}
 	return render(request, 'main/cameras.html', context=context)
+
+def camera(request, id):
+	
+	context = {
+		"page_name": "Camera page",
+		"object": Camera.objects.get(pk=id)
+	}
+	return render(request, 'main/camera.html', context=context)
+
+@gzip.gzip_page
+def live_stream(request, id):
+    try:
+        cam = vs.VideoCamera(id)
+        return StreamingHttpResponse(vs.gen(cam), content_type="multipart/x-mixed-replace;boundary=frame")
+    except:  
+        print("Error in streaming video")

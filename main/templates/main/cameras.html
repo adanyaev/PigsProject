@@ -55,7 +55,7 @@
               </div>
             </form>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 <button type="button" form="create_camera" id="createCameraBtn" class="btn btn-primary">Add</button>
                 <button type="button" form="create_camera" id="saveCameraBtn" class="btn btn-primary" hidden>Save</button>
             </div>
@@ -76,7 +76,7 @@
             <p class="card-text">Line width: {{ camera.line_width }}</p>
             <p class="card-text">Model: {{ camera.model }}</p>
             <div class="card-footer text-end">
-              <a href="#" class="btn btn-primary">Open</a>
+              <a href="/camera/{{ camera.id }}" class="btn btn-primary">Open</a>
               <a class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#exampleModal" onclick="editCamera('{{ camera.id }}')">Edit</a>
               <a class="btn btn-danger delbutton" onclick="deleteCamera('{{ camera.id }}')">Delete</a>
             </div>

@@ -17,9 +17,12 @@ def loginUser(request):
             data = json.loads(request.body)
             username = data['username']
             password = data['password']
+            rememberMe = data['rememberMe']
             user = authenticate(username=username, password=password)
             if user is not None:
                 login(request, user)
+                if not rememberMe:
+                    request.session.set_expiry(0)
                 return JsonResponse({'success': True, 'message': 'User authenticated successfully'})
             else:
                 return JsonResponse({'success': False, 'message': 'Invalid username or password'})
@@ -73,6 +76,7 @@ def regUser(request):
     
 
 @csrf_exempt
+@login_required
 def create_camera(request):
     if request.method == "POST" and request.content_type == 'application/json':
        # parse json data from request

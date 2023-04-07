@@ -7,6 +7,15 @@ async function regUser(event) {
     if (!reg.reportValidity()){
         return
       }
+
+    if (password.value != repeatpassword.value){
+        block = `<div class="mb-3"><div class="alert alert-warning alert-dismissible fade show" role="alert">
+        Пароли не совпадают
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>
+      </div>`
+        block_last.insertAdjacentHTML("afterend", block);
+        return
+    }
     
     let response = await fetch('/api/regUser', {
         method: 'POST',

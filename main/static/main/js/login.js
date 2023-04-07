@@ -9,7 +9,7 @@ async function loginUser(event) {
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({'username': username.value, 'password': password.value})
+        body: JSON.stringify({'username': username.value, 'password': password.value, 'rememberMe': rememberMe.checked})
     });
 
     if (response.ok) {

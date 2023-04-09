@@ -67,4 +67,4 @@ def live_stream(request, id):
 		return StreamingHttpResponse(vs.gen(cam), content_type="multipart/x-mixed-replace;boundary=frame")
 	except:  
 		print("Error in streaming video")
-
+		

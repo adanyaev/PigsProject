@@ -124,6 +124,7 @@ def create_camera(request):
         return JsonResponse(response_data, status=405)
 
 
+@login_required
 @csrf_exempt
 def delete_camera(request):
     if request.method == "POST" and request.content_type == 'application/json':
@@ -151,6 +152,7 @@ def delete_camera(request):
         return JsonResponse(response_data, status=405)
 
 
+@login_required
 @csrf_exempt
 def edit_camera(request):
     if request.method == "POST" and request.content_type == 'application/json':

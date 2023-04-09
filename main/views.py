@@ -35,12 +35,19 @@ def logout_view(request):
 
 @login_required
 def cameras(request):
+	cameras = Camera.objects.all()
+	if cameras:
+		cameras_cont = cameras.order_by('id')[::-1]
+	else:
+		cameras_cont = []
 	context = {
-		"page_name": "Connected cameras",
-		"cameras": Camera.objects.all().order_by('id')[::-1]
-	}
+			"page_name": "Connected cameras",
+			"cameras": cameras_cont
+		}
 	return render(request, 'main/cameras.html', context=context)
 
+
+@login_required
 def camera(request, id):
 	
 	context = {
@@ -49,11 +56,15 @@ def camera(request, id):
 	}
 	return render(request, 'main/camera.html', context=context)
 
+
+@login_required
 @gzip.gzip_page
 def live_stream(request, id):
-    try:
-        cam = vs.VideoCamera(id)
-        return StreamingHttpResponse(vs.gen(cam), content_type="multipart/x-mixed-replace;boundary=frame")
-    except:  
-        print("Error in streaming video")
+	try:
+		cam_obj = Camera.objects.get(pk=id)
+
+		cam = vs.VideoCamera(id, cam_obj.line_width, cam_obj.line_place, cam_obj.direction)
+		return StreamingHttpResponse(vs.gen(cam), content_type="multipart/x-mixed-replace;boundary=frame")
+	except:  
+		print("Error in streaming video")
 

@@ -7,7 +7,7 @@
 
 <div class="container">
 
-    <button type="button" class="btn btn-success btn-add" data-bs-toggle="modal" data-bs-target="#exampleModal">
+    <button type="button" class="btn btn-success btn-add" onclick="clearModal()" data-bs-toggle="modal" data-bs-target="#exampleModal">
       + Add new camera
     </button>
     <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -55,8 +55,9 @@
               </div>
             </form>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 <button type="button" form="create_camera" id="createCameraBtn" class="btn btn-primary">Add</button>
+                <button type="button" form="create_camera" id="saveCameraBtn" class="btn btn-primary" hidden>Save</button>
             </div>
         </div>
         </div>
@@ -65,20 +66,26 @@
 
     {% if cameras|length > 0 %}
       {% for camera in cameras %}
-        <div class="card camera-card" id="{{ camera.id }}">
+        <div class="card camera-card" id="camera_{{ camera.id }}" data-url="{{ camera.url }}" data-direction="{{ camera.direction }}" data-line_place="{{ camera.line_place }}"
+        data-line_width="{{ camera.line_width }}" data-model="{{ camera.model }}">
           <h5 class="card-header">{{ camera.id }}</h5>
           <div class="card-body">
             <h5 class="card-title">{{ camera.url }}</h5>
-            <a href="#" class="btn btn-primary">Open</a>
-            <a href="#" class="btn btn-primary">Edit</a>
-            <a href="#" class="btn btn-primary">Delete</a>
+            <p class="card-text">Direction: {{ camera.direction }}</p>
+            <p class="card-text">Line placement: {{ camera.line_place }}</p>
+            <p class="card-text">Line width: {{ camera.line_width }}</p>
+            <p class="card-text">Model: {{ camera.model }}</p>
+            <div class="card-footer text-end">
+              <a href="/camera/{{ camera.id }}" class="btn btn-primary">Open</a>
+              <a class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#exampleModal" onclick="editCamera('{{ camera.id }}')">Edit</a>
+              <a class="btn btn-danger delbutton" onclick="deleteCamera('{{ camera.id }}')">Delete</a>
+            </div>
           </div>
         </div>
       {% endfor %}
     {% else %}
       <h2>No cameras yet</h2>
     {% endif %}
-      
 
 </div>
 

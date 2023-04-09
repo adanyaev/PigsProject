@@ -1,0 +1,10 @@
+.container {
+    margin-top: 50px;
+    background-color: #ffffff;
+
+    width:100%;
+}
+
+.container > img {
+    width:100%;
+}

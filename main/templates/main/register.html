@@ -1,12 +1,23 @@
 {% extends "main/base.html" %}
 {% load static %}
 
+{% block header %}
+<nav class="navbar navbar-expand-sm bg-dark navbar-dark">
+  <span class="navbar-brand">{{ page_name }}</span>
+  <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+      <li class="nav-item"><a class="nav-link" href="/login">Войти</a></li>
+  </ul>
+  
+</nav>
+{% endblock header%}
+
 {% block content %}
 
 <link rel="stylesheet" href="{% static 'main/css/register.css' %}">
 <script src="{% static 'main/js/register.js' %}"></script>
 
 <body>
+
     <div class="card" style="width: 500px;">
         <div class="card-header">
           Регистрация
@@ -45,5 +56,5 @@
           <input type='button' form="reg" class="btn btn-primary" style="width:100%" value='Зарегистрироваться' id="regButt"></input>
         </form>
         </div>
-
+</body>
 {% endblock content %}

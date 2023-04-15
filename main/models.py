@@ -24,3 +24,4 @@ class Camera(models.Model):
     model = models.CharField(max_length=100, blank=False)
     pid = models.IntegerField(default=None, null=True)
     status = models.IntegerField(default=0)
+    current_counter = models.IntegerField(default=0)

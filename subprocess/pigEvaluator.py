@@ -1,4 +1,5 @@
 import argparse
+import threading
 import cv2
 import time
 # from moviepy.video.io.VideoFileClip import VideoFileClip
@@ -13,6 +14,9 @@ import torch
 from deep_sort_realtime.deepsort_tracker import DeepSort
 import pandas as pd
 import numpy as np
+import psycopg2
+import queue
+import os
 
 parser = argparse.ArgumentParser(description='Arguments for camera')
 parser.add_argument('-c','--camera_url', type=str, help='Camera web url (path)', required=True)
@@ -26,7 +30,7 @@ my_namespace = parser.parse_args()
 
 print(my_namespace)
 
-pig_weights_table = pd.read_csv('./pig_weights_table.csv')
+pig_weights_table = pd.read_csv('./subprocess/pig_weights_table.csv')
 pig_width_2_height = (pig_weights_table['1']/pig_weights_table['0']).mean()
 
 cap = cv2.VideoCapture(my_namespace.camera_url)
@@ -34,6 +38,14 @@ width = cap.get(3)
 height = cap.get(4)
 print(width, height)
 
+conn = psycopg2.connect(
+    host="localhost",
+    database="PigsProjectDb",
+    user="PigsProjectUser",
+    password="Qwerty2312")
+cur = conn.cursor()
+
+sql_update_counter = """UPDATE main_camera SET current_counter = current_counter + %s WHERE pid = %s"""
 
 def get_mass_from_box(box, horizontal_pixel_to_mm=0, pig_width_2_height=pig_width_2_height, pig_weights_table_tmp = pig_weights_table):
     w_is_bigger = None
@@ -62,52 +74,7 @@ def get_mass_from_box(box, horizontal_pixel_to_mm=0, pig_width_2_height=pig_widt
     pig_weights_table_tmp["all_diff"] = pig_weights_table_tmp["br_diff"]+pig_weights_table_tmp["len_diff"]
     return pig_weights_table_tmp.sort_values(by="all_diff").iloc[0][2]
 
-
-font = ImageFont.truetype("arial.ttf", 20)
-font_counter = ImageFont.truetype("arial.ttf", 64)
-font_mass = ImageFont.truetype("arial.ttf", 35)
-font_total_mass = ImageFont.truetype("arial.ttf", 32)
-
-def get_image_with_boxes_ind(img, 
-                             annot_pred, 
-                             counter=None, 
-                             detection_line=None, 
-                             horizontal_pixel_2_mm=None, 
-                             pig_id_2_weight={}):
-    image_for_draw = img
-    
-    image_for_draw = Image.fromarray(np.uint8(img)).convert('RGB')
-    
-    draw = ImageDraw.Draw(image_for_draw)
-    
-    for i in range(len(annot_pred)):
-        if counter is not None and annot_pred[i][4] in counter:
-            color_bbox = (0, 255, 0)
-        else:
-            color_bbox = (255,0,0) 
-        draw.rectangle([(annot_pred[i][0],
-                         annot_pred[i][1]),
-                        (annot_pred[i][2],
-                         annot_pred[i][3])],
-                       outline=color_bbox, width=2)
-        draw.text((annot_pred[i][0], annot_pred[i][1]), text=str(int(annot_pred[i][4])), fill=(0,255,0), font=font)
-        if annot_pred[i][4] in pig_id_2_weight:
-            draw.text((annot_pred[i][0], annot_pred[i][3]-100), text=str(int(sum(pig_id_2_weight[annot_pred[i][4]])/len(pig_id_2_weight[annot_pred[i][4]])))+" кг", fill=(139,0,255), font=font_mass)
-    if counter is not None:       
-        #draw.rectangle([(width-150, 0), (width, 150)], fill=(0, 0, 0))
-        draw.text((width - 74, 10), text=str(len(counter)), fill="red", font=font_counter)
-    if detection_line is not None:
-        draw.rectangle([(detection_line[0],
-                         detection_line[1]),
-                        (detection_line[2],
-                         detection_line[3])], outline=(0,255,255), width=2)
-    if pig_id_2_weight:
-        pigs_weights = [sum(i)/len(i) for i in pig_id_2_weight.values()]
-        draw.text((0, height-50), text="Total mass: " + str(int(sum(pigs_weights))) + ' кг', fill="red", font=font_total_mass)
-    return np.array(image_for_draw)
-
-
-def get_ditection_line(direction="Up",
+def get_detection_line(direction="Up",
                        divider=0.5,
                        width=None,
                        height=None,
@@ -148,6 +115,51 @@ def get_ditection_line(direction="Up",
         detection_line_orient="vertical"
     return (x1,y1, x2, y2), sign, detection_line_orient
 
+def get_image_with_boxes_ind(img, 
+                             annot_pred, 
+                             counter=None, 
+                             detection_line=None, 
+                             horizontal_pixel_2_mm=None, 
+                             pig_id_2_weight={}):
+    image_for_draw = img
+    
+    image_for_draw = Image.fromarray(np.uint8(img)).convert('RGB')
+    
+    draw = ImageDraw.Draw(image_for_draw)
+    
+    for i in range(len(annot_pred)):
+        if counter is not None and annot_pred[i][4] in counter:
+            color_bbox = (0, 255, 0)
+        else:
+            color_bbox = (255,0,0) 
+        draw.rectangle([(annot_pred[i][0],
+                         annot_pred[i][1]),
+                        (annot_pred[i][2],
+                         annot_pred[i][3])],
+                       outline=color_bbox, width=2)
+        draw.text((annot_pred[i][0], annot_pred[i][1]), text=str(int(annot_pred[i][4])), fill=(0,255,0), font=font)
+        if annot_pred[i][4] in pig_id_2_weight:
+            draw.text((annot_pred[i][0], annot_pred[i][3]-100), text=str(int(sum(pig_id_2_weight[annot_pred[i][4]])/len(pig_id_2_weight[annot_pred[i][4]])))+" кг", fill=(139,0,255), font=font_mass)
+    if counter is not None:       
+        #draw.rectangle([(width-150, 0), (width, 150)], fill=(0, 0, 0))
+        draw.text((width - 74, 10), text=str(len(counter)), fill="red", font=font_counter)
+    if detection_line is not None:
+        draw.rectangle([(detection_line[0],
+                         detection_line[1]),
+                        (detection_line[2],
+                         detection_line[3])], outline=(0,255,255), width=2)
+    if pig_id_2_weight:
+        pigs_weights = [sum(i)/len(i) for i in pig_id_2_weight.values()]
+        draw.text((0, height-50), text="Total mass: " + str(int(sum(pigs_weights))) + ' кг', fill="red", font=font_total_mass)
+    return np.array(image_for_draw)
+
+font = ImageFont.truetype("arial.ttf", 20)
+font_counter = ImageFont.truetype("arial.ttf", 64)
+font_mass = ImageFont.truetype("arial.ttf", 35)
+font_total_mass = ImageFont.truetype("arial.ttf", 32)
+
+q = queue.Queue()
+
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 print(device)
 
@@ -164,81 +176,86 @@ checker = {}
 pig_id_2_weight = {}
 
 
-(x1, y1, x2, y2), sign, detection_line_orient = get_ditection_line(my_namespace.pig_direction,
+(x1, y1, x2, y2), sign, detection_line_orient = get_detection_line(my_namespace.pig_direction,
                                               divider=my_namespace.pig_detection_line_place,
                                               width=width,
                                               height=height,
                                               line_diff=line_diff)
 
 
-while cap.isOpened():
-    try:
-        ret, frame = cap.read()
-    except:
-        # cap = cv2.VideoCapture(my_namespace.camera_url)
-        continue
-    if not ret:
-        # cap = cv2.VideoCapture(my_namespace.camera_url)
-        continue
-    rgb_frame_for_detection = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-    outputs = model(rgb_frame_for_detection)
-    
-    
-    inp = []
-    for i in range(len(outputs.xyxy[0])):
-        bb = outputs.xyxy[0][i][:4].detach().cpu().numpy()
-        t = ([min(bb[0], bb[2]), min(bb[1], bb[3]), abs(bb[0] - bb[2]), abs(bb[1] - bb[3])], outputs.xyxy[0][i][4].item(), 0)
-        inp.append(t)
-    if inp:
-        tracks = tracker.update_tracks(inp, frame=rgb_frame_for_detection)
-     
-        inp = []
-        for track in tracks:
-            if not track.is_confirmed():
+def grab(cap):
+        while True:
+            try:
+                (grabbed, img) = cap.read()
+                q.put(img)
+            except:
                 continue
-            track_id = track.track_id
-            ltrb = track.to_ltrb()
-            inp.append(ltrb.tolist() + [track_id])
+            if not grabbed:
+                continue
+
+
+def update():
+        global frame_pig_inc
+        while True:
+            frame_pig_inc = 0
+            cur.execute(sql_update_counter,(frame_pig_inc, os.getpid()))
+            conn.commit()
+            if q.empty() !=True:
+                img=q.get()
+            else:
+                continue
+            try:
+                rgb_frame_for_detection = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+            except:
+                continue
+            outputs = model(rgb_frame_for_detection)
             
-        for i in inp:
-            x_c = (i[0]+i[2])/2
-            y_c = (i[3]+i[1])/2
-            if i[4] in checker:
-                pig_direction = checker[i[4]]
-                if len(pig_direction) >= checker_treshold:
-                    if detection_line_orient=="horizontal" and y1 < y_c < y2 or detection_line_orient=="vertical" and x1 < x_c < x2:
-                        if sum([pig_direction[i+1]-pig_direction[i] for i in range(len(pig_direction)-1)]) < 0 and sign=="minus":
-                            pigs_set.add(i[4])
-                        elif sum([pig_direction[i+1]-pig_direction[i] for i in range(len(pig_direction)-1)]) > 0 and sign=="plus":
-                            pigs_set.add(i[4])
-            if detection_line_orient=="horizontal":
-                if i[4] in checker:
-                    checker[i[4]].append(y_c)
-                else:
-                    checker[i[4]] = [y_c]
-            elif detection_line_orient=="vertical":
-                if i[4] in checker:
-                    checker[i[4]].append(x_c)
-                else:
-                    checker[i[4]] = [x_c]
-    for i in checker:
-        if len(checker[i])>checker_treshold:
-                    checker[i] = checker[i][-checker_treshold:]
-        
-        
+            inp = []
+            for i in range(len(outputs.xyxy[0])):
+                bb = outputs.xyxy[0][i][:4].detach().cpu().numpy()
+                t = ([min(bb[0], bb[2]), min(bb[1], bb[3]), abs(bb[0] - bb[2]), abs(bb[1] - bb[3])], outputs.xyxy[0][i][4].item(), 0)
+                inp.append(t)
+            if inp:
+                tracks = tracker.update_tracks(inp, frame=rgb_frame_for_detection)
             
-    img = get_image_with_boxes_ind(rgb_frame_for_detection, inp, pigs_set, detection_line=[x1,y1,x2,y2])
+                inp = []
+                for track in tracks:
+                    if not track.is_confirmed():
+                        continue
+                    track_id = track.track_id
+                    ltrb = track.to_ltrb()
+                    inp.append(ltrb.tolist() + [track_id])
+                    
+                for i in inp:
+                    x_c = (i[0]+i[2])/2
+                    y_c = (i[3]+i[1])/2
+                    if i[4] in checker:
+                        pig_direction = checker[i[4]]
+                        if len(pig_direction) >= checker_treshold:
+                            if detection_line_orient=="horizontal" and y1 < y_c < y2 or detection_line_orient=="vertical" and self.x1 < x_c < self.x2:
+                                if sum([pig_direction[i+1]-pig_direction[i] for i in range(len(pig_direction)-1)]) < 0 and self.sign=="minus":
+                                    pigs_set.add(i[4])
+                                    frame_pig_inc+=1
+                                elif sum([pig_direction[i+1]-pig_direction[i] for i in range(len(pig_direction)-1)]) > 0 and self.sign=="plus":
+                                    pigs_set.add(i[4])
+                                    frame_pig_inc+=1
+                    if detection_line_orient=="horizontal":
+                        if i[4] in checker:
+                            checker[i[4]].append(y_c)
+                        else:
+                            checker[i[4]] = [y_c]
+                    elif detection_line_orient=="vertical":
+                        if i[4] in checker:
+                            checker[i[4]].append(x_c)
+                        else:
+                            checker[i[4]] = [x_c]
+            for i in checker:
+                if len(checker[i])>checker_treshold:
+                            checker[i] = checker[i][-checker_treshold:]
 
-    img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
+            cur.execute(sql_update_counter,(frame_pig_inc, os.getpid()))
+            conn.commit()
 
-    cv2.imshow('video feed', img)
 
-        
-    if cv2.waitKey(1) & 0xFF == ord('q'):
-        cap = cv2.VideoCapture(my_namespace.camera_url)
-        break
-    # if 0xFF == ord('q'):
-    #     break
-# out.release()
-cap.release()
-cv2.destroyAllWindows()
+threading.Thread(target=grab, args=([cap])).start()
+threading.Thread(target=update, args=()).start()

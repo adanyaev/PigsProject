@@ -181,11 +181,15 @@ class VideoCamera(object):
         while True:
             try:
                 (grabbed, img) = self.video.read()
-                self.q.put(img)
             except:
+                self.video = cv2.VideoCapture(self.camera.url)
+                print('error')
                 continue
             if not grabbed:
+                self.video = cv2.VideoCapture(self.camera.url)
+                print('not grabbed')
                 continue
+            self.q.put(img)
 
 
     def update(self):

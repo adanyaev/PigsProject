@@ -6,6 +6,9 @@ from django.contrib.auth.decorators import login_required
 from main.models import *
 import os
 import json
+import subprocess
+import sys
+import time
 
 
 @csrf_exempt
@@ -89,11 +92,17 @@ def create_camera(request):
         line_width = data["line_width"]
         model = data["model"]
         
+        try:
+            command = [sys.executable, r'./subprocess/pigEvaluator.py', '-c', url, '-d', direction, '--pig_detection_line_place', line_place, '--pig_detection_line_width', line_width, '--detection_model', './subprocess/best150']
+            sf = subprocess.Popen(command)
+
+        except:
+            print("Не удалось создать камеру")
+
         new_camera = Camera.objects.create(
             url=url, direction=direction, line_place=line_place,
-            line_width=line_width, model=model
-        )
-
+            line_width=line_width, model=model, pid=sf.pid
+        )    
         new_camera.save()
 
         # create new user instance and set fields values
@@ -124,6 +133,7 @@ def create_camera(request):
         return JsonResponse(response_data, status=405)
 
 
+@login_required
 @csrf_exempt
 def delete_camera(request):
     if request.method == "POST" and request.content_type == 'application/json':
@@ -132,8 +142,12 @@ def delete_camera(request):
         
         id = data["id"]
         print(Camera.objects.filter(id=id))
-        Camera.objects.filter(id=id).delete()
+        print(Camera.objects.filter(id=id)[0].pid)
         
+        #taskkill /PID <pid> /F
+        os.system(f"taskkill /PID {Camera.objects.filter(id=id)[0].pid} /F")
+        Camera.objects.filter(id=id).delete()
+
         response_data = {
             'success': True,
             'message': 'Camera was deleted successfully'
@@ -151,6 +165,7 @@ def delete_camera(request):
         return JsonResponse(response_data, status=405)
 
 
+@login_required
 @csrf_exempt
 def edit_camera(request):
     if request.method == "POST" and request.content_type == 'application/json':
@@ -159,13 +174,23 @@ def edit_camera(request):
         
         id = data["id"]
         obj = Camera.objects.get(pk=id)
+        os.system(f"taskkill /PID {Camera.objects.get(pk=id).pid} /F")
         obj.url = data['url']
         obj.direction = data['direction']
         obj.line_place = data["line_place"]
         obj.line_width = data["line_width"]
         obj.model = data["model"]
-        obj.save()
         
+        
+        try:
+            command = [sys.executable, r'./subprocess/pigEvaluator.py', '-c', obj.url, '-d', obj.direction, '--pig_detection_line_place', obj.line_place, '--pig_detection_line_width', obj.line_width, '--detection_model', './subprocess/best150']
+            sf = subprocess.Popen(command)
+            obj.pid = sf.pid
+        except:
+            print("Не удалось создать камеру")
+        obj.save()
+
+
         response_data = {
             'success': True,
             'message': 'Camera was edited successfully'

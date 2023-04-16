@@ -1,0 +1,78 @@
+{% extends "main/base.html" %}
+{% load static %}
+
+{% block content %}
+
+<link rel="stylesheet" href="{% static 'main/css/setLineSettings.css' %}">
+<script src="{% static 'main/js/setLineSettings.js' %}"></script>
+
+<body>
+   
+    <div class="content">
+        
+        <div class="main">
+            <div class="inputElement">
+                <label for="moveDirection" class="form-label">Направление движения</label>
+                <select class="form-select" aria-label="Default select" id="moveDirection">
+                    <option value="1" selected>Вверх</option>
+                    <option value="2">Вниз</option>
+                    <option value="3">Влево</option>
+                    <option value="4">Вправо</option>
+                </select>
+            </div>
+            <div class="inputElement">
+                <label for="lineWidth" class="form-label">Ширина линии подсчета</label>
+                <div class="inputValueContainer">
+        
+                    <input type="range" class="form-range" min="1" max="640" id="lineWidth">
+                    <label for="lineWidth" class="form-label" id="lineWidthValueLabel">321</label>
+                </div>
+            </div>
+            <div class="inputElement">
+                <label for="linePlace" class="form-label">Положение линии подсчета</label>
+                <div class="inputValueContainer">
+                    
+                    <input type="range" class="form-range" min="0.01" max="0.99" step="0.01" id="linePlace">
+                    <label for="linePlace" class="form-label" id="linePlaceValueLabel">50%</label>
+
+                </div>
+            <button type="button" class="btn btn-primary" id="submitButt" data-id="{{ cam_id }}">Подтвердить выбор настроек</button>
+                
+            </div>
+            
+            <!-- <div class="col-md-6 col-lg-4">
+                <label for="range">Range:</label>
+                <input type="range" class="form-range" id="range" min="1" max=\"640\" step="1">
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <label for="slider">Slider:</label>
+                <select class="form-select" id="slider">
+                    <option value="up">Up</option>
+                    <option value="down">Down</option>
+                </select>
+            </div> -->
+        </div>
+        <div class="sep"></div>
+        <div class="imageArea">
+            <div class="ImageCanvasWrapper">
+                <img id="bkImage" src="/media/test.png" width=640 height=640></img>
+                <canvas id='sampleImage' height='640' width='640'>Обновите браузер</canvas>
+                <div class="arrow" id="arrow">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>            
+            </div>
+            
+        </div>
+
+
+    </div>
+        
+    
+
+
+  </body>
+
+
+{% endblock content %}

@@ -212,3 +212,7 @@
     }
   }
 }
+
+.counterPanel > .btn {
+  width: 30%;
+}

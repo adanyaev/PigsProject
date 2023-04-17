@@ -57,7 +57,7 @@ def cameraLiveStream(request, id):
 		"page_name": "Camera page",
 		"object": request.user.origin_user.camera_set.get(pk=id)
 	}
-	return render(request, 'main/camera.html', context=context)
+	return render(request, 'main/cameraLiveStream.html', context=context)
 
 
 @login_required

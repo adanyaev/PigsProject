@@ -8,5 +8,6 @@ urlpatterns = [
     path('createCamera', views.create_camera, name='create_camera'),
     path('deleteCamera', views.delete_camera, name='delete_camera'),
     path('editCamera', views.edit_camera, name="edit_camera"),
-    path('setLineSettings', views.setLineSettings, name="setLineSettings")
+    path('setLineSettings', views.setLineSettings, name="setLineSettings"),
+    path('resetCounter', views.reset_counter, name="reset_counter")
 ]

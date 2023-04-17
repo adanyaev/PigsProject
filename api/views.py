@@ -245,8 +245,6 @@ def setLineSettings(request):
         return JsonResponse(response_data, status=405)
 
 
-
-
 @login_required
 @csrf_exempt
 def edit_camera(request):
@@ -279,6 +277,42 @@ def edit_camera(request):
             'message': 'Camera was edited successfully'
         }
         
+        return JsonResponse(response_data)
+    
+    # handle other request methods 
+    else:
+        response_data = {
+            'success': False,
+            'message': 'Only POST requests are allowed'
+        }
+        
+        return JsonResponse(response_data, status=405)
+
+
+@login_required
+@csrf_exempt
+def reset_counter(request):
+    if request.method == "POST" and request.content_type == 'application/json':
+       # parse json data from request
+        data = json.loads(request.body)
+        
+        id = data["id"]
+
+        try:
+            obj = Camera.objects.get(pk=id)
+            obj.current_counter = 0
+            obj.save()
+
+            response_data = {
+                'success': True,
+                'message': 'Счетчик успешно обновлен'
+            }
+        except Exception as exc:
+            response_data = {
+                'success': False,
+                'message': 'Ошибка при обновлении счетчика'
+            }
+
         return JsonResponse(response_data)
     
     # handle other request methods 

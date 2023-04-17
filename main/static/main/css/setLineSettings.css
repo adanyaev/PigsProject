@@ -11,12 +11,11 @@
   }
 
 .content > .sep {
-    background-color: #E9E9E9;
+    background-color: grey;
     border-radius:1px;
   }
 
 .main {
-    background-color: bisque;
     padding:1rem;
     display:flex;
     flex-direction: column;
@@ -25,7 +24,6 @@
 }
 
 .imageArea {
-    background-color: aqua;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -34,8 +32,8 @@
   
 .ImageCanvasWrapper{
     position:relative;
-    width: 640px;
-    height: 640px;
+    width: 80%;
+    height: 80%;
     align-self: center;
 }
 #bkImage{

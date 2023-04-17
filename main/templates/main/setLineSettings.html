@@ -36,27 +36,18 @@
                     <label for="linePlace" class="form-label" id="linePlaceValueLabel">50%</label>
 
                 </div>
-            <button type="button" class="btn btn-primary" id="submitButt" data-id="{{ cam_id }}">Подтвердить выбор настроек</button>
+            <button type="button" class="btn btn-primary" id="submitButt" data-id="{{ cam.id }}">Подтвердить выбор настроек</button>
                 
             </div>
             
-            <!-- <div class="col-md-6 col-lg-4">
-                <label for="range">Range:</label>
-                <input type="range" class="form-range" id="range" min="1" max=\"640\" step="1">
-            </div>
-            <div class="col-md-6 col-lg-4">
-                <label for="slider">Slider:</label>
-                <select class="form-select" id="slider">
-                    <option value="up">Up</option>
-                    <option value="down">Down</option>
-                </select>
-            </div> -->
         </div>
         <div class="sep"></div>
         <div class="imageArea">
-            <div class="ImageCanvasWrapper">
-                <img id="bkImage" src="/media/test.png" width=640 height=640></img>
+            <div class="ImageCanvasWrapper" id="ImageCanvasWrapper">
+                <img id="bkImage" src="{{ cam.sample_image.url }}" width=640 height=640></img>
                 <canvas id='sampleImage' height='640' width='640'>Обновите браузер</canvas>
+                <!-- <img id="bkImage" src="{{ cam.sample_image.url }}"></img>
+                <canvas id='sampleImage'>Обновите браузер</canvas> -->
                 <div class="arrow" id="arrow">
                     <span></span>
                     <span></span>

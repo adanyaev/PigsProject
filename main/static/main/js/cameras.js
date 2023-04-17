@@ -9,10 +9,7 @@ function clearModal()
     document.getElementById('createCameraBtn').hidden = false
 
     document.getElementById('url').setAttribute('value', "")
-    document.getElementById('line_place').setAttribute('value', 0.5)
-    document.getElementById('line_width').setAttribute('value', 20)
     document.getElementById('model').setAttribute('value', "")
-    document.getElementById('direction').value = element.getAttribute("Up")
 }
 
 async function editCamera(id)
@@ -97,22 +94,22 @@ async function createCamera(event) {
         console.log("Error in form")
         return
       }
-    
+    submitSpinner.hidden = false
     let response = await fetch('/api/createCamera', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-            'url': url.value, 'direction': direction.value, 'line_place': line_place.value,
-            'line_width': line_width.value, 'model': model.value
+            'name': camName.value, 'url': url.value, 'model': model.value
         })
     });
-
+    submitSpinner.hidden = true
     if (response.ok) {
         data = await response.json()
         if (data['success'] == true) {
-            window.location.replace("/cameras");
+            let id = data['cam_id']
+            window.location.replace(`/setLineSettings/${id}`);
         } else {
         block = `<div class="mb-3"><div class="alert alert-warning alert-dismissible fade show" role="alert">
         ${data['message']}

@@ -21,40 +21,22 @@
             <form id="create_camera" method="post">
                 {% csrf_token %}
                 <div class="mb-4">
+                  <label for="camName">Название камеры</label>
+                  <input type="text" name="camName" id="camName" class="form-control" placeholder="Название" required >
+              </div>
+                <div class="mb-4">
                     <label for="url">Camera URL</label>
                     <input type="text" name="url" id="url" class="form-control" placeholder="RTSP Protocol" required >
                 </div>
                 <div class="mb-4">
-                <div class="row g-3 align-items-center">
-                    <div class="col-md-6">
-                        <label for="direction">Direction</label>
-                        <select id="direction" name="direction" class="form-control" aria-label="Default select example" required>
-                            <option name="direction" value="Up" selected>Up</option>
-                            <option name="direction" value="Down">Down</option>
-                            <option name="direction" value="Left">Left</option>
-                            <option name="direction" value="Right">Right</option>
-                          </select>
-                    </div>
-                    <div class="col-md-6">
-                        <label for="line_place">Counting line location</label>
-                        <input type="number" name="line_place" value="0.5" min="0" max="1" step="0.1" id="line_place" class="form-control" placeholder="From 0 to 1">
-                    </div>
+                  <label for="model">Model</label>
+                  <input type="text" name="model" id="model" class="form-control" placeholder="Choose model">
                 </div>
-                </div>
-                <div class="mb-4">
-                <div class="row g-3 align-items-center">
-                    <div class="col-md-6">
-                        <label for="line_width">Counting line width</label>
-                        <input type="number" name="line_width" value="20" id="line_width" class="form-control" placeholder="Width in pixels">
-                    </div>
-                    <div class="col-md-6">
-                        <label for="model">Model</label>
-                        <input type="text" name="model" id="model" class="form-control" placeholder="Choose model" required >
-                    </div>
-                </div>
-              </div>
             </form>
             <div class="modal-footer">
+              <div class="spinner-border text-primary" id="submitSpinner" role="status" hidden>
+                <span class="visually-hidden">Loading...</span>
+              </div>
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 <button type="button" form="create_camera" id="createCameraBtn" class="btn btn-primary">Add</button>
                 <button type="button" form="create_camera" id="saveCameraBtn" class="btn btn-primary" hidden>Save</button>

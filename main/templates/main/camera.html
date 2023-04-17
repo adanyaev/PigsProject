@@ -1,12 +1,83 @@
 {% extends "main/base.html" %}
 {% load static %}
+
 {% block content %}
 
 <link rel="stylesheet" href="{% static 'main/css/camera.css' %}">
+<script src="{% static 'main/js/camera.js' %}"></script>
 
-<div class="container">
-    <img src="{% url 'live_stream' object.id %}" alt="No stream available">
-</div>
+<body>
+   
+    
+    <div class="content">
+        
+        <div class="counterPanel">
+          <div class="card mb-3 text-center" style="width: 18rem;">
+            <div class="card-body">
+              <h1 class="card-title" id="counterString">{{ cam.current_counter }}</h1>
+              <p class="card-text">Текущее значение счетчика</p>
+            </div>
+          </div>
+          <button type="button" class="btn btn-primary">Обнулить счетчик</button>
+          
+            
+        </div>
+        <div class="sep"></div>
+        <div class="controls">
+            <h4>{{ cam.name }}</h4>
+          <p>Url адрес камеры: {{cam.url}}</p>
+          <p>Текущий статус: </p>
+          <ol class="progress-step-indicator" id='stepIndicator' role="list">
+            {% if cam.status == 0 %}
+            <li class="progress_li candyStripe" aria-current="step">
+              <i class="bi bi-check"></i>
+              <div class="progress_text hyphenate">Status 1<br>Камера создана, но не настроена. Поток обработки не запущен</div>
+            </li>
+            <li class="progress_li" >
+              <i class="bi bi-check"></i>
+              <div class="progress_text hyphenate">Status 2<br>Камера создана и настроена. Поток обработки не запущен.</div>
+            </li>
+            <li class="progress_li">
+              <i class="bi bi-check"></i>
+              <div class="progress_text hyphenate">Status 3<br>Камера настроена, поток обработки запущен.</div>
+            </li>
+            {% elif cam.status == 1 %}
+            <li class="progress_li-done">
+              <i class="bi bi-check"></i>
+              <div class="progress_text hyphenate">Status 1<br>Камера создана, но не настроена. Поток обработки не запущен</div>
+            </li>
+            <li class="progress_li candyStripe" aria-current="step">
+              <i class="bi bi-check"></i>
+              <div class="progress_text hyphenate">Status 2<br>Камера создана и настроена. Поток обработки не запущен.</div>
+            </li>
+            <li class="progress_li">
+              <i class="bi bi-check"></i>
+              <div class="progress_text hyphenate">Status 3<br>Камера настроена, поток обработки запущен.</div>
+            </li>
+
+            {% elif cam.status == 2 %}
+            <li class="progress_li-done">
+              <i class="bi bi-check"></i>
+              <div class="progress_text hyphenate">Status 1<br>Камера создана, но не настроена. Поток обработки не запущен</div>
+            </li>
+            <li class="progress_li-done">
+              <i class="bi bi-check"></i>
+              <div class="progress_text hyphenate">Status 2<br>Камера создана и настроена. Поток обработки не запущен.</div>
+            </li>
+            <li class="progress_li candyStripe" aria-current="step">
+              <i class="bi bi-check"></i>
+              <div class="progress_text hyphenate">Status 3<br>Камера настроена, поток обработки запущен.</div>
+            </li>
+            {% endif %}
+          
+          </ol>
+          
+        </div>
+
+
+    </div>
+
+  </body>
 
 
 {% endblock content %}

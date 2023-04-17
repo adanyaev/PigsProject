@@ -1,10 +1,214 @@
-.container {
-    margin-top: 50px;
-    background-color: #ffffff;
+.content {
+    padding: 1rem;
+    height: 90vh;
+    /* height: 100%; */
+    width: 99vw;
+    display: grid;
+    grid-template-columns: 3fr 2px 7fr;
+    overflow: auto;
+  }
 
-    width:100%;
+
+
+.content > .sep {
+    background-color: grey;
+    border-radius:1px;
+  }
+
+.counterPanel {
+    padding:1rem;
+    display:flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    overflow:auto;
 }
 
-.container > img {
-    width:100%;
+
+.controls {
+    display: flex;
+    flex-direction: column;
+    padding: 2rem;
+    font-size: 1.4rem;
+}
+
+
+#counterString {
+  font-size: 5rem;
+}
+
+
+
+/* Progress step indicator */
+
+.progress-step-indicator {
+  --colorDone: #0d6efd; /* Global primary color should be used here */
+  --colorToDo: #c3c5c7; /* Light grey */
+  --colorStripe: rgba(255, 255, 255, 0.4); /* Requires the transparency */
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1em;
+  font-size: 1rem; /* Controls icon, and text sizes, relatively */
+  
+}
+[class^="progress_li"] {
+  --iconBorder: var(--colorToDo);
+  --iconBg: white;
+  --iconColor: white;
+  --iconShadow: none;
+  --progressColor: var(--colorToDo);
+  display: grid;
+  align-items: baseline;
+  grid-template-columns: 1.38em 1fr;
+  position: relative;
+  z-index: 1;
+  padding: 0;
+  margin: 0 0 .5rem;
+  color: var(--colorToDo);
+}
+.progress_li[aria-current="step"],
+.progress_li-done {
+  --iconBorder: var(--colorDone);
+  --iconBg: var(--colorDone);
+  --progressColor: var(--colorDone);
+  color: var(--colorDone);
+}
+.progress_li[aria-current="step"] {
+  --iconShadow: 0 .0625em .25em rgba(0,0,0,.5);
+  color: inherit; /* current step has body text color */
+  padding: .25em 0 .25em 1em;
+}
+.progress_li[aria-current="step"]::before {
+  /* Background, when a vertical list */
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: -1;
+  width: 100%;
+  height: 100%;
+  background-color: var(--colorDone);
+  opacity: 25%;
+}
+
+[class^="progress_li"] .bi {
+  flex-shrink: 0;
+  display: inline-block;
+  overflow: hidden;
+  margin: 0 .25em 0 0;
+  font-size: 1em;
+  line-height: 0;
+  border-radius: 50%;
+  border: .0625em solid var(--iconBorder);
+  background-color: var(--iconBg);
+  color: var(--iconColor);
+}
+
+.progress_text {
+  display: inline-block;
+  font-size: 80%;
+}
+
+/* Set min-width to cater for copy length, MUST keep in ems. 
+   Progress steps appear as a vertical list below this width */
+@media (min-width: 30em) {
+
+  .progress-step-indicator {
+    display: flex;
+  }
+  [class^="progress_li"] {
+    display: block;
+    flex: 1;
+    margin: 0;
+  }
+  [class^="progress_li"][aria-current="step"] {
+    padding: 0;
+  }
+  [class^="progress_li"]:last-child {
+    max-width: 2em;
+    max-width: min-content;
+  }
+
+  .progress_li[aria-current="step"]::before {
+    display: none;
+  }
+
+  [class^="progress_li"] .bi {
+    display: block;
+    width: 1em;
+    height: 1em;
+    margin: 0;
+    font-size: 2em;
+    box-shadow: var(--iconShadow);
+  }
+  [class^="progress_li"] .bi:before {
+    margin-top: -0.0625em;
+    margin-left: -0.0625em;
+  }
+  [class^="progress_li"] .bi:after {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    top: .45em;
+    display: block;
+    width: 100%;
+    height: .125em;
+    background-color: var(--progressColor);
+  }
+  [class^="progress_li"]:last-child .bi::after {
+    display: none;
+  }
+  .progress_li[aria-current="step"] .bi:before,
+  .progress_li[aria-current="step"] .bi:after {
+    background-image: linear-gradient(
+      var(--colorStripe),
+      var(--colorStripe)
+    );
+  }
+
+  .progress_text {
+    padding: .5em .5em 0 .0625em;
+  }
+  [class^="progress_li"]:last-child .progress_text {
+    padding-right: 0;
+  }
+
+
+  /* Candy-stripe */
+  .candyStripe[aria-current="step"] .bi:before,
+  .candyStripe[aria-current="step"] .bi:after {
+    background-image: linear-gradient(
+      -45deg,
+      var(--colorStripe) 12.5%,
+      transparent 12.5%,
+      transparent 25%,
+      var(--colorStripe) 25%,
+      var(--colorStripe) 37.5%,
+      transparent 37.5%,
+      transparent 50%,
+      var(--colorStripe) 50%,
+      var(--colorStripe) 62.5%,
+      transparent 62.5%,
+      transparent 75%,
+      var(--colorStripe) 75%,
+      var(--colorStripe) 87.5%,
+      transparent 87.5%,
+      transparent
+    );
+    background-size: 50px 50px;
+    background-position: 0 0;
+    text-shadow: 0 0.0625em rgba(0,0,0,.25);
+  }
+  /* Candy-stripe animation */
+  @media (prefers-reduced-motion: no-preference) {
+    .candyStripe[aria-current="step"] .bi:before,
+    .candyStripe[aria-current="step"] .bi:after {
+      animation: candyStripeAnim 6s linear infinite;
+    }
+    @keyframes candyStripeAnim {
+      to {
+        background-position: 50px 50px;
+      }
+    }
+  }
 }

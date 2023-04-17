@@ -10,6 +10,7 @@ urlpatterns = [
     path('registration', views.register, name='registration'),
     path('cameras', views.cameras, name="cameras"),
     path('setLineSettings/<int:id>', views.setLineSettings, name="setLineSettings"),
-    path('camera/<int:id>', views.camera, name="camera"),
+    path('cameraLiveStream/<int:id>', views.cameraLiveStream, name="cameraLiveStream"),
     path('live_stream/<int:id>', views.live_stream, name="live_stream"),
+    path('camera/<int:id>', views.camera_view, name="camera_view"),
 ]

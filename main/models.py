@@ -15,13 +15,16 @@ class ExtendedUser(models.Model):
 
 
 class Camera(models.Model):
-    url = models.CharField(max_length=100, blank=False)
-    description = models.CharField(max_length=400)
+    name = models.CharField(max_length=200, null=False, blank=False)
+    url = models.CharField(max_length=100, null=False, blank=False)
+    user = models.ForeignKey('ExtendedUser', on_delete=models.CASCADE)
+    description = models.CharField(max_length=400, null=True, blank=True)
     creationDate = models.DateTimeField(auto_now_add=True)
-    direction = models.CharField(max_length=100, null=False, blank=False)
-    line_place = models.FloatField(default=0.5, blank=False)
-    line_width = models.IntegerField(default=20, blank=False)
-    model = models.CharField(max_length=100, blank=False)
+    direction = models.CharField(max_length=100, null=True, blank=False)
+    line_place = models.FloatField(default=0.5, null=True, blank=False)
+    line_width = models.IntegerField(default=20, null=True, blank=False)
+    model = models.CharField(max_length=100, null=True, default='default model')
     pid = models.IntegerField(default=None, null=True)
     status = models.IntegerField(default=0)
     current_counter = models.IntegerField(default=0)
+    sample_image = models.FileField(upload_to='sample_images/', null=True)

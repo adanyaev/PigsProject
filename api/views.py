@@ -258,10 +258,11 @@ def edit_camera(request):
         obj = Camera.objects.get(pk=id)
         os.system(f"taskkill /PID {Camera.objects.get(pk=id).pid} /F")
         obj.url = data['url']
-        obj.direction = data['direction']
-        obj.line_place = data["line_place"]
-        obj.line_width = data["line_width"]
+        #obj.direction = data['direction']
+        #obj.line_place = data["line_place"]
+        #obj.line_width = data["line_width"]
         obj.model = data["model"]
+        obj.name = data["name"]
         
         
         try:

@@ -17,14 +17,15 @@ async function editCamera(id)
     let element = document.getElementById("camera_" + id)
     if (!element)
         return
-        
+
     document.getElementById('saveCameraBtn').hidden = false;
     document.getElementById('createCameraBtn').hidden = true;
     document.getElementById('url').setAttribute('value', element.getAttribute("data-url"))
-    document.getElementById('line_place').setAttribute('value', +(element.getAttribute("data-line_place").replace(',', '.')))
-    document.getElementById('line_width').setAttribute('value', +(element.getAttribute("data-line_width").replace(',', '.')))
+    document.getElementById('camName').setAttribute('value', element.getAttribute("data-camName"))
+    //document.getElementById('line_place').setAttribute('value', +(element.getAttribute("data-line_place").replace(',', '.')))
+    //document.getElementById('line_width').setAttribute('value', +(element.getAttribute("data-line_width").replace(',', '.')))
     document.getElementById('model').setAttribute('value', element.getAttribute("data-model"))
-    document.getElementById('direction').value = element.getAttribute("data-direction")
+    //document.getElementById('direction').value = element.getAttribute("data-direction")
     document.getElementById('saveCameraBtn').setAttribute("data-id", id)
 }
 
@@ -36,13 +37,13 @@ async function saveCamera()
     }
 
     let id = saveCameraBtn.getAttribute("data-id")
+
     let response = await fetch('/api/editCamera', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({'id': id, 'url': url.value, 'direction': direction.value, 'line_place': line_place.value,
-        'line_width': line_width.value, 'model': model.value})
+        body: JSON.stringify({'id': id, 'url': url.value, 'model': model.value, 'name': camName.value})
     });
 
     if (response.ok)

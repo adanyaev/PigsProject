@@ -49,8 +49,8 @@
     {% if cameras|length > 0 %}
       {% for camera in cameras %}
         <div class="card camera-card" id="camera_{{ camera.id }}" data-url="{{ camera.url }}" data-direction="{{ camera.direction }}" data-line_place="{{ camera.line_place }}"
-        data-line_width="{{ camera.line_width }}" data-model="{{ camera.model }}">
-          <h5 class="card-header">{{ camera.id }}</h5>
+        data-line_width="{{ camera.line_width }}" data-model="{{ camera.model }}" data-camName="{{ camera.name }}">
+          <h5 class="card-header">{{ camera.name }}</h5>
           <div class="card-body">
             <h5 class="card-title">{{ camera.url }}</h5>
             <p class="card-text">Direction: {{ camera.direction }}</p>

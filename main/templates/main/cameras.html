@@ -6,6 +6,9 @@
 <script src="{% static 'main/js/cameras.js' %}"></script>
 
 <div class="container">
+  <script>
+    var CSRF_TOKEN = '{{ csrf_token }}';
+</script>
 
     <button type="button" class="btn btn-success btn-add" onclick="clearModal()" data-bs-toggle="modal" data-bs-target="#exampleModal">
       + Add new camera

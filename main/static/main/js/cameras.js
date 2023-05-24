@@ -38,12 +38,14 @@ async function saveCamera()
 
     let id = saveCameraBtn.getAttribute("data-id")
 
-    let response = await fetch('/api/editCamera', {
-        method: 'POST',
+    let response = await fetch('/restapi/camera/' + id, {
+        method: 'PUT',
         headers: {
-            'Content-Type': 'application/json'
+            "Accept": "application/json",
+            'Content-Type': 'application/json',
+            "X-CSRFToken": CSRF_TOKEN,
         },
-        body: JSON.stringify({'id': id, 'url': url.value, 'model': model.value, 'name': camName.value})
+        body: JSON.stringify({'url': url.value, 'model': model.value, 'name': camName.value})
     });
 
     if (response.ok)
@@ -66,10 +68,12 @@ async function deleteCamera(id) {
     if (!element)
         return
     
-    let response = await fetch('/api/deleteCamera', {
-        method: 'POST',
+    let response = await fetch('/restapi/camera/' + id, {
+        method: 'DELETE',
         headers: {
-            'Content-Type': 'application/json'
+            "Accept": "application/json",
+            'Content-Type': 'application/json',
+            "X-CSRFToken": CSRF_TOKEN,
         },
         body: JSON.stringify({'id': id})
     });
@@ -95,11 +99,14 @@ async function createCamera(event) {
         console.log("Error in form")
         return
       }
+
     submitSpinner.hidden = false
-    let response = await fetch('/api/createCamera', {
+    let response = await fetch('/restapi/camera', {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json'
+            "Accept": "application/json",
+            'Content-Type': 'application/json',
+            "X-CSRFToken": CSRF_TOKEN,
         },
         body: JSON.stringify({
             'name': camName.value, 'url': url.value, 'model': model.value

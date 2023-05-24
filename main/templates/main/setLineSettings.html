@@ -9,7 +9,9 @@
 <body>
    
     <div class="content">
-        
+        <script>
+            var CSRF_TOKEN = '{{ csrf_token }}';
+        </script>
         <div class="main">
             <div class="inputElement">
                 <label for="moveDirection" class="form-label">Направление движения</label>

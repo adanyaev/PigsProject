@@ -35,6 +35,7 @@ LOGIN_URL = '/login'
 INSTALLED_APPS = [
     "main",
     "api",
+    "rest_framework",
     "django_cleanup.apps.CleanupConfig",
     "django.contrib.admin",
     "django.contrib.auth",

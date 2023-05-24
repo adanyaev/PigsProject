@@ -34,10 +34,13 @@ async function setLineSettings(event) {
     let lwid = parseInt(lineWidth.value)
     let lplace = parseFloat(linePlace.value)
     let direct = moveDirection.value
-    let response = await fetch('/api/setLineSettings', {
+
+    let response = await fetch('/restapi/setup_line_settings', {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json'
+            "Accept": "application/json",
+            'Content-Type': 'application/json',
+            "X-CSRFToken": CSRF_TOKEN,
         },
         body: JSON.stringify({'lineWidth': lwid, 'linePlace': lplace, 'lineDirection': direct, 'camId': submitButt.dataset.id})
     });

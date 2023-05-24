@@ -262,7 +262,6 @@ def edit_camera(request):
         obj.model = data["model"]
         obj.name = data["name"]
         
-        
         try:
             command = [sys.executable, r'./subprocess/pigEvaluator.py', '-c', obj.url, '-d', obj.direction, '--pig_detection_line_place', obj.line_place, '--pig_detection_line_width', obj.line_width, '--detection_model', './subprocess/best150']
             sf = subprocess.Popen(command)

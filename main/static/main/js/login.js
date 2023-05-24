@@ -4,7 +4,7 @@ window.onload = () => {
 
 async function loginUser(event) {
     
-    let response = await fetch('/api/loginUser', {
+    let response = await fetch('/restapi/login_user', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'

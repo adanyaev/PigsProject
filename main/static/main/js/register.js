@@ -17,7 +17,7 @@ async function regUser(event) {
         return
     }
     
-    let response = await fetch('/api/regUser', {
+    let response = await fetch('/restapi/register_user', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'

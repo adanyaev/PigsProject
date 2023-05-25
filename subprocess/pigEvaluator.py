@@ -11,13 +11,14 @@ from PIL import Image, ImageDraw, ImageFont
 import numpy as np
 # import requests
 import torch
-from deep_sort_realtime.deepsort_tracker import DeepSort
 import pandas as pd
 import numpy as np
 import psycopg2
 import queue
 import os
 import tritonclient.http as httpclient
+
+from ByteTracker.byte_tracker import BYTETracker
 
 parser = argparse.ArgumentParser(description='Arguments for camera')
 parser.add_argument('-c','--camera_url', type=str, help='Camera web url (path)', required=True)
@@ -164,14 +165,7 @@ font_total_mass = ImageFont.truetype("arial.ttf", 32)
 
 q = queue.Queue()
 
-device = 'cuda' if torch.cuda.is_available() else 'cpu'
-print(device)
-
-
-# model = torch.hub.load('ultralytics/yolov5', 'custom', my_namespace.detection_model)
-
-
-tracker = DeepSort(max_age=15)
+tracker = BYTETracker(frame_rate=60, track_thresh=0.5, track_buffer=30)
 
 
 checker_treshold = 13
@@ -225,29 +219,26 @@ while True:
     #     continue
     detection_input = httpclient.InferInput("images", img_preprocessed.shape, datatype="FP32")
     detection_input.set_data_from_numpy(img_preprocessed, binary_data=True)
-    print(1)
+    
     outputs = client.infer(model_name="detector", inputs=[detection_input])
-    print(2)
+    print(my_namespace.camera_url)
     boxes = outputs.as_numpy('boxes')
     scores = outputs.as_numpy('scores')
     labels = outputs.as_numpy('labels')
-    print(3)
-    # outputs = model(rgb_frame_for_detection)
     
-    inp = []
+    # outputs = model(rgb_frame_for_detection)
+    inputs = []
     for i in range(len(boxes[0])):
         bb = boxes[0][i]
-        t = ([min(bb[0], bb[2]), min(bb[1], bb[3]), abs(bb[0] - bb[2]), abs(bb[1] - bb[3])], scores[0][i], labels[0][i])
-        inp.append(t)
-    if inp:
-        tracks = tracker.update_tracks(inp, frame=img[0])
+        t = (min(bb[0], bb[2]), min(bb[1], bb[3]), abs(bb[0] - bb[2]), abs(bb[1] - bb[3]), scores[0][i], labels[0][i])
+        inputs.append(t)
+    if inputs:
+        inputs = np.stack(inputs, axis=0)
+        print(inputs.shape)
+        online_targets = tracker.update(inputs, (640, 640), (640, 640))
         inp = []
-        for track in tracks:
-            if not track.is_confirmed():
-                continue
-            track_id = track.track_id
-            ltrb = track.to_ltrb()
-            inp.append(ltrb.tolist() + [track_id])
+        for t in online_targets:
+            inp.append([t.tlwh[0], t.tlwh[1], t.tlwh[0]+t.tlwh[2], t.tlwh[1]+t.tlwh[3], t.track_id])
             
         for i in inp:
             x_c = (i[0]+i[2])/2

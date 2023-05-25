@@ -41,3 +41,44 @@ async function deleteCamera(id) {
         }
     }
 }
+
+async function launchCam(id) {
+    let response = await fetch('/api/launchCameraProcess', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({'id': id})
+    });
+
+    if (response.ok)
+    {
+        data = await response.json()
+        if (data['success'] == true) {
+            window.location.reload();
+        } else {
+            console.log(data['message'])
+        }
+    }
+}
+
+
+async function stopCam(id) {
+    let response = await fetch('/api/stopCameraProcess', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({'id': id})
+    });
+
+    if (response.ok)
+    {
+        data = await response.json()
+        if (data['success'] == true) {
+            window.location.reload();
+        } else {
+            console.log(data['message'])
+        }
+    }
+}

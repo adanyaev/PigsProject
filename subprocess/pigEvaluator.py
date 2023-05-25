@@ -17,6 +17,7 @@ import numpy as np
 import psycopg2
 import queue
 import os
+import tritonclient.http as httpclient
 
 parser = argparse.ArgumentParser(description='Arguments for camera')
 parser.add_argument('-c','--camera_url', type=str, help='Camera web url (path)', required=True)
@@ -37,6 +38,9 @@ cap = cv2.VideoCapture(my_namespace.camera_url)
 width = cap.get(3)
 height = cap.get(4)
 print(width, height)
+
+
+dim = (640, 640)
 
 conn = psycopg2.connect(
     host="localhost",
@@ -164,7 +168,8 @@ device = 'cuda' if torch.cuda.is_available() else 'cpu'
 print(device)
 
 
-model = torch.hub.load('ultralytics/yolov5', 'custom', my_namespace.detection_model)
+# model = torch.hub.load('ultralytics/yolov5', 'custom', my_namespace.detection_model)
+
 
 tracker = DeepSort(max_age=15)
 
@@ -184,78 +189,96 @@ pig_id_2_weight = {}
 
 
 def grab(cap):
+        counter = 0
         while True:
             try:
                 (grabbed, img) = cap.read()
-                q.put(img)
+                counter += 1
+                if counter == 3:
+                    q.put(img)
+                    counter = 0
             except:
                 continue
             if not grabbed:
                 continue
 
-
-def update():
-        global frame_pig_inc
-        while True:
-            frame_pig_inc = 0
-            cur.execute(sql_update_counter,(frame_pig_inc, os.getpid()))
-            conn.commit()
-            if q.empty() !=True:
-                img=q.get()
-            else:
-                continue
-            try:
-                rgb_frame_for_detection = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-            except:
-                continue
-            outputs = model(rgb_frame_for_detection)
-            
-            inp = []
-            for i in range(len(outputs.xyxy[0])):
-                bb = outputs.xyxy[0][i][:4].detach().cpu().numpy()
-                t = ([min(bb[0], bb[2]), min(bb[1], bb[3]), abs(bb[0] - bb[2]), abs(bb[1] - bb[3])], outputs.xyxy[0][i][4].item(), 0)
-                inp.append(t)
-            if inp:
-                tracks = tracker.update_tracks(inp, frame=rgb_frame_for_detection)
-            
-                inp = []
-                for track in tracks:
-                    if not track.is_confirmed():
-                        continue
-                    track_id = track.track_id
-                    ltrb = track.to_ltrb()
-                    inp.append(ltrb.tolist() + [track_id])
-                    
-                for i in inp:
-                    x_c = (i[0]+i[2])/2
-                    y_c = (i[3]+i[1])/2
-                    if i[4] in checker:
-                        pig_direction = checker[i[4]]
-                        if len(pig_direction) >= checker_treshold:
-                            if detection_line_orient=="horizontal" and y1 < y_c < y2 or detection_line_orient=="vertical" and self.x1 < x_c < self.x2:
-                                if sum([pig_direction[i+1]-pig_direction[i] for i in range(len(pig_direction)-1)]) < 0 and self.sign=="minus":
-                                    pigs_set.add(i[4])
-                                    frame_pig_inc+=1
-                                elif sum([pig_direction[i+1]-pig_direction[i] for i in range(len(pig_direction)-1)]) > 0 and self.sign=="plus":
-                                    pigs_set.add(i[4])
-                                    frame_pig_inc+=1
-                    if detection_line_orient=="horizontal":
-                        if i[4] in checker:
-                            checker[i[4]].append(y_c)
-                        else:
-                            checker[i[4]] = [y_c]
-                    elif detection_line_orient=="vertical":
-                        if i[4] in checker:
-                            checker[i[4]].append(x_c)
-                        else:
-                            checker[i[4]] = [x_c]
-            for i in checker:
-                if len(checker[i])>checker_treshold:
-                            checker[i] = checker[i][-checker_treshold:]
-
-            cur.execute(sql_update_counter,(frame_pig_inc, os.getpid()))
-            conn.commit()
-
-
 threading.Thread(target=grab, args=([cap])).start()
-threading.Thread(target=update, args=()).start()
+
+
+client = httpclient.InferenceServerClient(url="127.0.0.1:8000")
+global frame_pig_inc
+while True:
+    frame_pig_inc = 0
+    cur.execute(sql_update_counter,(frame_pig_inc, os.getpid()))
+    conn.commit()
+    if q.empty() !=True:
+        img=q.get()
+    else:
+        continue
+    img_preprocessed = cv2.resize(img, dim, interpolation = cv2.INTER_LANCZOS4)
+    img_preprocessed = img_preprocessed.transpose(2,0,1)
+    img_preprocessed = (img_preprocessed.astype('float32')-110)/58
+    img_preprocessed = np.expand_dims(img_preprocessed, axis=0)
+    # try:
+    #     rgb_frame_for_detection = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+    # except:
+    #     continue
+    detection_input = httpclient.InferInput("images", img_preprocessed.shape, datatype="FP32")
+    detection_input.set_data_from_numpy(img_preprocessed, binary_data=True)
+    print(1)
+    outputs = client.infer(model_name="detector", inputs=[detection_input])
+    print(2)
+    boxes = outputs.as_numpy('boxes')
+    scores = outputs.as_numpy('scores')
+    labels = outputs.as_numpy('labels')
+    print(3)
+    # outputs = model(rgb_frame_for_detection)
+    
+    inp = []
+    for i in range(len(boxes[0])):
+        bb = boxes[0][i]
+        t = ([min(bb[0], bb[2]), min(bb[1], bb[3]), abs(bb[0] - bb[2]), abs(bb[1] - bb[3])], scores[0][i], labels[0][i])
+        inp.append(t)
+    if inp:
+        tracks = tracker.update_tracks(inp, frame=img[0])
+        inp = []
+        for track in tracks:
+            if not track.is_confirmed():
+                continue
+            track_id = track.track_id
+            ltrb = track.to_ltrb()
+            inp.append(ltrb.tolist() + [track_id])
+            
+        for i in inp:
+            x_c = (i[0]+i[2])/2
+            y_c = (i[3]+i[1])/2
+            if i[4] in checker:
+                pig_direction = checker[i[4]]
+                if len(pig_direction) >= checker_treshold:
+                    if detection_line_orient=="horizontal" and y1 < y_c < y2 or detection_line_orient=="vertical" and x1 < x_c < x2:
+                        if sum([pig_direction[i+1]-pig_direction[i] for i in range(len(pig_direction)-1)]) < 0 and sign=="minus":
+                            pigs_set.add(i[4])
+                            frame_pig_inc+=1
+                        elif sum([pig_direction[i+1]-pig_direction[i] for i in range(len(pig_direction)-1)]) > 0 and sign=="plus":
+                            pigs_set.add(i[4])
+                            frame_pig_inc+=1
+            if detection_line_orient=="horizontal":
+                if i[4] in checker:
+                    checker[i[4]].append(y_c)
+                else:
+                    checker[i[4]] = [y_c]
+            elif detection_line_orient=="vertical":
+                if i[4] in checker:
+                    checker[i[4]].append(x_c)
+                else:
+                    checker[i[4]] = [x_c]
+    for i in checker:
+        if len(checker[i])>checker_treshold:
+                    checker[i] = checker[i][-checker_treshold:]
+    print('working!')
+    cur.execute(sql_update_counter,(frame_pig_inc, os.getpid()))
+    conn.commit()
+
+
+# threading.Thread(target=grab, args=([cap])).start()
+#threading.Thread(target=update, args=()).start()

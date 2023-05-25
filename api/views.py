@@ -220,7 +220,7 @@ def setLineSettings(request):
         
             return JsonResponse(response_data, status=405)
 
-        id2direction = {1: 'Up', 2: 'Left', 3: 'Down', 4: 'Right'}
+        id2direction = {1: 'Up', 2: 'Down', 3: 'Left', 4: 'Right'}
         cam.direction = id2direction[lineDirection]
         cam.line_width = lineWidth
         cam.line_place = linePlace
@@ -256,18 +256,13 @@ def edit_camera(request):
         obj = Camera.objects.get(pk=id)
         os.system(f"taskkill /PID {Camera.objects.get(pk=id).pid} /F")
         obj.url = data['url']
-        #obj.direction = data['direction']
-        #obj.line_place = data["line_place"]
-        #obj.line_width = data["line_width"]
+        obj.direction = data['direction']
+        obj.line_place = data["line_place"]
+        obj.line_width = data["line_width"]
         obj.model = data["model"]
         obj.name = data["name"]
+        obj.status = 1
         
-        try:
-            command = [sys.executable, r'./subprocess/pigEvaluator.py', '-c', obj.url, '-d', obj.direction, '--pig_detection_line_place', obj.line_place, '--pig_detection_line_width', obj.line_width, '--detection_model', './subprocess/best150']
-            sf = subprocess.Popen(command)
-            obj.pid = sf.pid
-        except:
-            print("Не удалось создать камеру")
         obj.save()
 
 
@@ -322,3 +317,95 @@ def reset_counter(request):
         }
         
         return JsonResponse(response_data, status=405)
+    
+
+@login_required
+@csrf_exempt
+def launch_camera_process(request):
+    if request.method == "POST" and request.content_type == 'application/json':
+       # parse json data from request
+        data = json.loads(request.body)
+        
+        # try:
+        #     id = data["id"]
+        #     obj = Camera.objects.get(pk=id)
+        #     command = [sys.executable, r'./subprocess/pigEvaluator.py', '-c', obj.url, '-d', obj.direction, '--pig_detection_line_place', obj.line_place, '--pig_detection_line_width', obj.line_width, '--detection_model', './subprocess/best150']
+        #     sf = subprocess.Popen(command)
+        #     obj.pid = sf.pid
+        #     obj.status = 2
+        #     obj.current_counter = 0
+        #     obj.save()
+        #     response_data = {
+        #         'success': True,
+        #         'message': 'Удалось запустить камеру'
+        #     }
+        # except:
+        #     response_data = {
+        #         'success': False,
+        #         'message': 'Не удалось запустить камеру'
+        #     }
+        #     print("Не удалось запустить камеру")
+
+        id = data["id"]
+        obj = Camera.objects.get(pk=id)
+        command = [sys.executable, r'./subprocess/pigEvaluator.py', '-c', obj.url, '-d', obj.direction, '--pig_detection_line_place', str(obj.line_place), '--pig_detection_line_width', str(obj.line_width), '--detection_model', './subprocess/best150']
+        sf = subprocess.Popen(command)
+        obj.pid = sf.pid
+        obj.status = 2
+        obj.current_counter = 0
+        obj.save()
+        response_data = {
+            'success': True,
+            'message': 'Удалось запустить камеру'
+            }
+
+        return JsonResponse(response_data)
+     
+    else:
+        response_data = {
+            'success': False,
+            'message': 'Only POST requests are allowed'
+        }
+        
+        return JsonResponse(response_data, status=405)
+    
+    
+@login_required
+@csrf_exempt
+def stop_camera_process(request):
+    if request.method == "POST" and request.content_type == 'application/json':
+       # parse json data from request
+        data = json.loads(request.body)
+        
+        try:
+            id = data["id"]
+            obj = Camera.objects.get(pk=id)
+            if obj.status != 2:
+                return JsonResponse(response_data)
+            os.system(f"taskkill /PID {Camera.objects.get(pk=id).pid} /F")
+            obj.pid = None
+            obj.status = 1
+            obj.current_counter = 0
+            obj.save()
+            response_data = {
+                'success': True,
+                'message': 'Удалось остановить камеру'
+            }
+        except:
+            response_data = {
+                'success': False,
+                'message': 'Не удалось остановить камеру'
+            }
+            print("Не удалось запустить камеру")
+
+        return JsonResponse(response_data)
+     
+    else:
+        response_data = {
+            'success': False,
+            'message': 'Only POST requests are allowed'
+        }
+        
+        return JsonResponse(response_data, status=405)
+    
+

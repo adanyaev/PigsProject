@@ -22,7 +22,9 @@ class VideoCamera(object):
         self.font_total_mass = ImageFont.truetype("arial.ttf", 32)
         self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
         self.model = torch.hub.load('ultralytics/yolov5', 'custom', BASE_DIR / 'subprocess/best.pt')
+        self.model.conf = 0.9
         self.model.to(self.device)
+        
         self.tracker = DeepSort(max_age=15)
         self.q=queue.Queue()
 

@@ -11,13 +11,13 @@
 </script>
 
     <button type="button" class="btn btn-success btn-add" onclick="clearModal()" data-bs-toggle="modal" data-bs-target="#exampleModal">
-      + Add new camera
+      + Добавить камеру
     </button>
     <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">New camera settings</h5>
+            <h5 class="modal-title" id="exampleModalLabel">Настройки добавляемой камеры</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
@@ -28,12 +28,12 @@
                   <input type="text" name="camName" id="camName" class="form-control" placeholder="Название" required >
               </div>
                 <div class="mb-4">
-                    <label for="url">Camera URL</label>
+                    <label for="url">URL камеры</label>
                     <input type="password" name="url" id="url" class="form-control" placeholder="RTSP Protocol" required >
                 </div>
                 <div class="mb-4">
-                  <label for="model">Model</label>
-                  <input type="text" name="model" id="model" class="form-control" placeholder="Choose model">
+                  <label for="model">Модель</label>
+                  <input type="text" name="model" id="model" class="form-control" placeholder="На данный момент недоступно">
                 </div>
             </form>
             <div class="modal-footer">

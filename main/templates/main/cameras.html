@@ -33,16 +33,16 @@
                 </div>
                 <div class="mb-4">
                   <label for="model">Модель</label>
-                  <input type="text" name="model" id="model" class="form-control" placeholder="На данный момент недоступно">
+                  <input type="text" name="model" id="model" class="form-control" disabled placeholder="RTMDet-s">
                 </div>
             </form>
             <div class="modal-footer">
               <div class="spinner-border text-primary" id="submitSpinner" role="status" hidden>
-                <span class="visually-hidden">Loading...</span>
+                <span class="visually-hidden">Загрузка...</span>
               </div>
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" form="create_camera" id="createCameraBtn" class="btn btn-primary">Add</button>
-                <button type="button" form="create_camera" id="saveCameraBtn" class="btn btn-primary" hidden>Save</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                <button type="button" form="create_camera" id="createCameraBtn" class="btn btn-primary">Добавить</button>
+                <button type="button" form="create_camera" id="saveCameraBtn" class="btn btn-primary" hidden>Сохранить</button>
             </div>
         </div>
         </div>
@@ -56,20 +56,20 @@
           <h5 class="card-header">{{ camera.name }}</h5>
           <div class="card-body">
             <h5 class="card-title">{{ camera.url }}</h5>
-            <p class="card-text">Direction: {{ camera.direction }}</p>
-            <p class="card-text">Line placement: {{ camera.line_place }}</p>
-            <p class="card-text">Line width: {{ camera.line_width }}</p>
-            <p class="card-text">Model: {{ camera.model }}</p>
+            <p class="card-text">Направление движения свиней: {{ camera.direction }}</p>
+            <p class="card-text">Расположение линии подсчета: {{ camera.line_place }}</p>
+            <p class="card-text">Ширина линии подсчета: {{ camera.line_width }}</p>
+            <p class="card-text">Модель: {{ camera.model }}</p>
             <div class="card-footer text-end">
-              <a href="/camera/{{ camera.id }}" class="btn btn-primary">Open</a>
-              <a class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#exampleModal" onclick="editCamera('{{ camera.id }}')">Edit</a>
-              <a class="btn btn-danger delbutton" onclick="deleteCamera('{{ camera.id }}')">Delete</a>
+              <a href="/camera/{{ camera.id }}" class="btn btn-primary">Открыть</a>
+              <a class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#exampleModal" onclick="editCamera('{{ camera.id }}')">Изменить</a>
+              <a class="btn btn-danger delbutton" onclick="deleteCamera('{{ camera.id }}')">Удалить</a>
             </div>
           </div>
         </div>
       {% endfor %}
     {% else %}
-      <h2>No cameras yet</h2>
+      <h2>На данный момент камер нет</h2>
     {% endif %}
 
 </div>

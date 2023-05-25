@@ -15,19 +15,19 @@ status2message = {0: "Ожидает настройки линии детекц�
 @login_required
 def index(request):
 	
-	context = {"page_name": "Main Page"}
+	context = {"page_name": "Главная страница"}
 	return render(request, 'main/index.html', context=context)
 
 
 def login(request):
     
-    context = {"page_name": "Authorization Page"}
+    context = {"page_name": "Авторизация"}
     return render(request, 'main/login.html', context=context)
 
 
 def register(request):
 
-	context = {"page_name": "Registration Page"}
+	context = {"page_name": "Регистрация"}
 	return render(request, 'main/register.html', context=context)
 
 
@@ -44,7 +44,7 @@ def cameras(request):
 	else:
 		cameras_cont = []
 	context = {
-			"page_name": "Connected cameras",
+			"page_name": "Камеры",
 			"cameras": cameras_cont
 		}
 	return render(request, 'main/cameras.html', context=context)
@@ -54,7 +54,7 @@ def cameras(request):
 def cameraLiveStream(request, id):
 	
 	context = {
-		"page_name": "Camera page",
+		"page_name": "Просмотр камеры",
 		"object": request.user.origin_user.camera_set.get(pk=id)
 	}
 	return render(request, 'main/cameraLiveStream.html', context=context)
@@ -93,7 +93,7 @@ def camera_view(request, id):
 		return HttpResponseNotFound()
 	
 	context = {
-		"page_name": "Настройка линии детекции",
+		"page_name": "Камера",
 		"cam": cam_obj
 	}
 	return render(request, 'main/camera.html', context=context)

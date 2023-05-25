@@ -45,7 +45,7 @@ async function saveCamera()
             'Content-Type': 'application/json',
             "X-CSRFToken": CSRF_TOKEN,
         },
-        body: JSON.stringify({'url': url.value, 'model': model.value, 'name': camName.value})
+        body: JSON.stringify({'url': url.value, 'model': 'RTMDet-s', 'name': camName.value})
     });
 
     if (response.ok)
@@ -109,7 +109,7 @@ async function createCamera(event) {
             "X-CSRFToken": CSRF_TOKEN,
         },
         body: JSON.stringify({
-            'name': camName.value, 'url': url.value, 'model': model.value
+            'name': camName.value, 'url': url.value, 'model': 'RTMDet-s'
         })
     });
     submitSpinner.hidden = true
